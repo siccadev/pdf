@@ -4,7 +4,8 @@ import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Message from "./screens/Message"
-
+import pdfeditor from './screens/pdfeditor'
+import PDFconvert from './screens/PDFconvert'
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -12,7 +13,7 @@ export default function App() {
     <NavigationContainer>
 
       <Stack.Navigator initialRouteName="StartingPage" screenOptions={{ headerShown: false }}>
-         <Stack.Screen name="Message" component={Message} /> 
+         <Stack.Screen name="PDFconvert" component={PDFconvert} /> 
         
       
 
