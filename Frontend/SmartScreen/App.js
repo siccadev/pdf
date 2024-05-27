@@ -4,22 +4,19 @@ import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Message from "./screens/Message"
-import pdfeditor from './screens/pdfeditor'
-import PDFconvert from './screens/PDFconvert'
+import Onbording from "./screens/Onbording"
+import Launch from "./screens/Launch "
+
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-
       <Stack.Navigator initialRouteName="StartingPage" screenOptions={{ headerShown: false }}>
-         <Stack.Screen name="PDFconvert" component={PDFconvert} /> 
-        
-      
-
-
+         <Stack.Screen name="Launch" component={Launch} /> 
+         <Stack.Screen name="Onbording" component={Onbording} /> 
+        {/* <Stack.Screen name="Message" component={Message} />  */}
        </Stack.Navigator>
-
     </NavigationContainer>
   );
 }
