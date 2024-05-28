@@ -12,7 +12,7 @@ const Launch = () => {
   useEffect(() => {
       const timer = setTimeout(() => {
         navigation.navigate('Home');
-      }, 5000);
+      }, 3000);
       return () => clearTimeout(timer);
     }, []);
 
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     },
     smartScan: {
         top: height * 0.3, // Adjust top relative to screen height
-        left: width * 0.2, // Adjust left relative to screen width
+        left: width * 0.24, // Adjust left relative to screen width
         fontSize: width * 0.1, // Adjust font size relative to screen width
         color: Color.colorBlack,
         width: width * 0.6, // Adjust width relative to screen width
@@ -55,8 +55,8 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.amikoRegular,
     },
     byEmnaHomrani: {
-        top: height * 0.95, // Adjust top relative to screen height
-        left: width * 0.3, // Adjust left relative to screen width
+        top: height * 0.97, // Adjust top relative to screen height
+        left: width * 0.33, // Adjust left relative to screen width
         fontSize: FontSize.size_base,
         color: Color.shadesWhite,
         textAlign: "left",
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     d65cdf8f27a20fd0ab9be06227bb74Icon: {
         top: height * 0.35, // Adjust top relative to screen height
-        left: width * 0.1, // Adjust left relative to screen width
+        left: width * 0.15, // Adjust left relative to screen width
         height: height * 0.2, // Adjust height relative to screen height
     },
     launch: {
