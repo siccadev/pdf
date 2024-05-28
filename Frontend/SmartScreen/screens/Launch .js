@@ -11,7 +11,7 @@ const Launch = () => {
   const navigation = useNavigation();
   useEffect(() => {
       const timer = setTimeout(() => {
-        navigation.navigate('Onbording');
+        navigation.navigate('Home');
       }, 5000);
       return () => clearTimeout(timer);
     }, []);
