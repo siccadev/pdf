@@ -3,23 +3,23 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Home from "./screens/Home"
 import Message from "./screens/Message"
-import pdfeditor from './screens/pdfeditor'
-import PDFconvert from './screens/PDFconvert'
+import Launch from "./screens/Launch "
+import Help from "./screens/Help"
+import Onbording from "./screens/Onbording"
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-
       <Stack.Navigator initialRouteName="StartingPage" screenOptions={{ headerShown: false }}>
-         <Stack.Screen name="PDFconvert" component={PDFconvert} /> 
-        
-      
-
-
+         {/* <Stack.Screen name="Launch" component={Launch} />  */}
+         {/* <Stack.Screen name="Onbording" component={Onbording} />  */}
+         {/* <Stack.Screen name="Home" component={Home} />  */}
+         {/* <Stack.Screen name="Help" component={Help} />  */}
+        <Stack.Screen name="Message" component={Message} /> 
        </Stack.Navigator>
-
     </NavigationContainer>
   );
 }
