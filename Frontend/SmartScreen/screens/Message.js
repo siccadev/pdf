@@ -1,56 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert,Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageUploadTwo from './ImageUploadTwo';
+import * as Print from 'expo-print';
 import { Feather } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
+import { WebView } from 'react-native-webview';
+import * as FileSystem from 'expo-file-system';
+
 const { width, height } = Dimensions.get('window');
 
-const MessageCard = ({ id, primary, secondary, person, imageUrl, comments, onDelete, onComment }) => {
-  const [newComment, setNewComment] = useState('');
-  
-  const handleAddComment = () => {
-    if (newComment.trim() !== '') {
-      onComment(id, newComment.trim());
-      setNewComment('');
-    }
-  };
-
+const MessageCard = ({ id, secondary, imageUrl, onDelete, onConvertToPDF }) => {
   return (
     <View style={styles.messageCard}>
-      <Image source={{ uri: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png" }} style={styles.avatar} />
       <View style={styles.messageContent}>
-        <Text style={styles.primaryText}>{primary}</Text>
         <Text style={styles.secondaryText}>{secondary}</Text>
         {imageUrl && (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: imageUrl }} style={styles.messageImage} />
-          </View>
-        )}
-        <View style={styles.commentsContainer}>
-          <Text style={styles.commentsText}>Comments:</Text>
-
-          {comments.map((comment, index) => (
-            <Text key={`${id}_${index}`} style={styles.commentText}>{comment}</Text>
-          ))}
-          <View style={styles.commentInputContainer}>
-            <TextInput
-              style={styles.commentInput}
-              placeholder="Add a comment..."
-              value={newComment}
-              onChangeText={setNewComment}
-            />
-            <TouchableOpacity style={styles.addCommentButton} onPress={handleAddComment}>
-              <Feather name="send" size={20} color="#fff"  />
+          <>
+            <TouchableOpacity style={styles.imageContainer} onPress={() => Alert.alert('Image Clicked', 'Show full image functionality here')}>
+              <Image source={{ uri: imageUrl }} style={styles.messageImage} resizeMode="contain" />
             </TouchableOpacity>
-          </View>
-        </View>
+            <TouchableOpacity style={styles.pdfButton} onPress={() => onConvertToPDF(imageUrl)}>
+              <Text style={styles.pdfButtonText}>Convert to PDF</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
       <TouchableOpacity onPress={() => onDelete(id)}>
         <Feather name="trash" size={24} color="red" />
@@ -63,7 +37,10 @@ const BottomAppBar = () => {
   const [inputValue, setInputValue] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [messages, setMessages] = useState([]);
+  const [pdfUri, setPdfUri] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
+
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -94,7 +71,7 @@ const BottomAppBar = () => {
   };
 
   const handlePostMessage = () => {
-    if (inputValue.trim() !== '') {
+    if (imageUrl.trim() !== '') {
       const newMessage = {
         id: messages.length + 1,
         primary: inputValue,
@@ -107,6 +84,8 @@ const BottomAppBar = () => {
       setInputValue('');
       setImageUrl('');
       Alert.alert('Message Posted', 'Your message has been posted successfully.');
+    } else {
+      Alert.alert('No Image', 'Please upload an image to post a message.');
     }
   };
 
@@ -115,21 +94,32 @@ const BottomAppBar = () => {
     setMessages(updatedMessages);
   };
 
-  const handleComment = (id, comment) => {
-    const updatedMessages = messages.map(message => {
-      if (message.id === id) {
-        return {
-          ...message,
-          comments: [...message.comments, comment],
-        };
-      }
-      return message;
-    });
-    setMessages(updatedMessages);
-  };
-
   const handleChangeImage = (url) => {
     setImageUrl(url);
+  };
+
+  const handleConvertToPDF = async (image) => {
+    const htmlContent = `
+      <html>
+        <body style="text-align: center;">
+          <img src="${image}" style="width: 100%; height: auto;" />
+        </body>
+      </html>
+    `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      const fileUri = `${FileSystem.documentDirectory}converted.pdf`;
+      await FileSystem.moveAsync({
+        from: uri,
+        to: fileUri
+      });
+      setPdfUri(fileUri);
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      Alert.alert('Error', 'An error occurred while generating the PDF.');
+    }
   };
 
   return (
@@ -140,24 +130,41 @@ const BottomAppBar = () => {
             key={message.id}
             {...message}
             onDelete={handleDeleteMessage}
-            onComment={handleComment}
+            onConvertToPDF={handleConvertToPDF}
           />
         ))}
       </ScrollView>
       <View style={styles.inputContainer}>
         <ImageUploadTwo changeImage={handleChangeImage} />
-        <TextInput
-          style={styles.input}
-          placeholder="Type your message here..."
-          value={inputValue}
-          onChangeText={handleInputChange}
-        />
         <TouchableOpacity style={styles.postButton} onPress={handlePostMessage}>
-  
-         < Feather name="send" size={20} color="#fff" />
+          <Feather name="send" size={20} color="white" />
         </TouchableOpacity>
       </View>
-     
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
+          {pdfUri && (
+            <WebView
+              style={styles.webview}
+              source={{ uri: pdfUri }}
+              originWhitelist={['*']}
+              allowFileAccess={true}
+            />
+          )}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(!modalVisible)}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -169,14 +176,14 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flex: 1,
-  marginTop:60
+    marginTop: 60,
   },
   messageCard: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
     marginBottom: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -187,21 +194,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-    marginTop:-280
-  },
   messageContent: {
     flex: 1,
-  },
-  primaryText: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-    fontSize: 16,
-    color: '#333',
   },
   secondaryText: {
     marginBottom: 5,
@@ -219,85 +213,66 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
   },
-  commentsContainer: {
-    marginTop: 10,
-  },
-  commentsText: {
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: '#333',
-  },
-  commentText: {
-    marginBottom: 5,
-    fontSize: 12,
-    color: '#666',
-  },
-  commentInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  commentInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    height: 40,
-    marginRight: 10,
-  },
-  addCommentButton: {
-    backgroundColor:'#209FA6',
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    height: 40,
-  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-marginRight:30,
-
+    padding: 1,
     borderTopColor: '#ccc',
-    backgroundColor: 'rgba(240, 240, 240, 0.5)'
-  },
-  input: {
-    flex: 1,
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginRight: 10,
-    width:10
+    backgroundColor:"#CBCBCB",
+    borderRadius: 25,
+    top:10,
   },
   postButton: {
-    backgroundColor: '#209FA6',
+    backgroundColor: '#AF6A00',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 16,
+    left: -10,
   },
-  postButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  tabbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  pdfButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    paddingVertical: 10,
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
   },
-  tabItem: {
+  pdfButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  modalView: {
     flex: 1,
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  webview: {
+    width: width - 40,
+    height: height - 100,
+  },
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#2196F3',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

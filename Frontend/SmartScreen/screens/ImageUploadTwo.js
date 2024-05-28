@@ -3,6 +3,8 @@ import { ActivityIndicator, TouchableOpacity, Image, View, Text, StyleSheet } fr
 import * as ImagePicker from "expo-image-picker"
 import axios from "axios"
 import { FontAwesome } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { EvilIcons } from '@expo/vector-icons';
 const cloudName = "db2yjlbsw"
 const uploadPreset = "lzoc60oh"
 
@@ -80,10 +82,10 @@ const ImageUploadTwo = ({ changeImage }) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.customButtonFolder} onPress={openImagePicker}>
             
-          <Image source={require('../assets/image-gallery.png')} style={styles.buttonImage} />
+          <EvilIcons name="image" size={54} color="#AF6A00" style={styles.buttonImage} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.customButtonCamera} onPress={handleCameraLaunch}>
-          <Image source={require('../assets/camera.png')} style={styles.buttonImage} />
+          <Feather name="camera" size={39} color="#AF6A00" style={styles.buttonImag}/>
         </TouchableOpacity>
       </View>
     </View>
@@ -117,9 +119,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10
   },
   buttonImage: {
-    width: 40, // Adjust image width as needed
-    height: 60, // Adjust image height as needed
+    width: 50, // Adjust image width as needed
+    height: 50, // Adjust image height as needed
     resizeMode: 'contain',
+    marginLeft: -120,
+
+  },
+  buttonImag: {
+    width: 50, // Adjust image width as needed
+    height: 50, // Adjust image height as needed
+    resizeMode: 'contain',
+    marginLeft: 20,
   },
 });
 
