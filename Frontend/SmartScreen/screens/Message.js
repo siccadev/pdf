@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ImageUploadTwo from './ImageUploadTwo';
+import ImageUploadTwo from './ImageUploadTwo'; // Assume this is your image upload component
 import * as Print from 'expo-print';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -99,31 +99,36 @@ const BottomAppBar = () => {
   };
 
   const handleConvertToPDF = async (image) => {
-    const htmlContent = `
-      <html>
-        <body style="text-align: center;">
-          <img src="${image}" style="width: 100%; height: auto;" />
-        </body>
-      </html>
-    `;
-
     try {
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      const fileUri = `${FileSystem.documentDirectory}converted.pdf`;
-      await FileSystem.moveAsync({
-        from: uri,
-        to: fileUri
-      });
-      setPdfUri(fileUri);
+      const html = `
+        <html>
+          <body>
+            <img src="${image}" style="width: 100%; height: auto;" />
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html });
+      setPdfUri(uri);
       setModalVisible(true);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      Alert.alert('Error', 'An error occurred while generating the PDF.');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (pdfUri) {
+      const downloadPath = `${FileSystem.documentDirectory}DownloadedPDF.pdf`;
+      await FileSystem.copyAsync({
+        from: pdfUri,
+        to: downloadPath,
+      });
+      Alert.alert('PDF Downloaded', `PDF has been downloaded to ${downloadPath}`);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.view}>
       <ScrollView style={styles.messageContainer}>
         {messages.map(message => (
           <MessageCard
@@ -163,6 +168,12 @@ const BottomAppBar = () => {
           >
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.downloadButton}
+            onPress={handleDownloadPDF}
+          >
+            <Text style={styles.downloadButtonText}>Download PDF</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </View>
@@ -170,13 +181,16 @@ const BottomAppBar = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  view: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    paddingHorizontal: width * 0.05,
   },
   messageContainer: {
     flex: 1,
-    marginTop: 60,
+    marginTop: height * 0.1,
+    width: '100%',
   },
   messageCard: {
     flexDirection: 'row',
@@ -186,10 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -218,10 +229,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     borderTopColor: '#ccc',
+    borderTopWidth: 1,
     backgroundColor: 'rgba(240, 240, 240, 0.5)',
+    width: '100%',
   },
   postButton: {
-    backgroundColor: '#209FA6',
+    backgroundColor: '#ff9900',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -231,7 +244,7 @@ const styles = StyleSheet.create({
   pdfButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#ff9900',
     borderRadius: 5,
     alignItems: 'center',
   },
@@ -247,10 +260,7 @@ const styles = StyleSheet.create({
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
@@ -267,6 +277,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  downloadButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#ff9900',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  downloadButtonText: {
     color: '#fff',
     fontSize: 16,
   },
