@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 
 const { width, height } = Dimensions.get('window');
 
@@ -141,6 +142,7 @@ const BottomAppBar = () => {
       }
     }
   };
+  
 
   return (
     <View style={styles.view}>

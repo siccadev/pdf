@@ -8,6 +8,7 @@ import Message from "./screens/Message"
 import Launch from "./screens/Launch "
 import Help from "./screens/Help"
 import Onbording from "./screens/Onbording"
+import PdfEditor from './screens/PdfEditor';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -18,7 +19,8 @@ export default function App() {
          {/* <Stack.Screen name="Onbording" component={Onbording} />  */}
          {/* <Stack.Screen name="Home" component={Home} />  */}
          {/* <Stack.Screen name="Help" component={Help} />  */}
-        <Stack.Screen name="Message" component={Message} /> 
+        <Stack.Screen name="PdfEditor" component={PdfEditor} /> 
+        {/* <Stack.Screen name="Message" component={Message} />  */}
        </Stack.Navigator>
     </NavigationContainer>
   );
