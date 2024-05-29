@@ -120,35 +120,25 @@ const BottomAppBar = () => {
   const handleDownloadPDF = async () => {
     if (pdfUri) {
       try {
-        // Ensure the file exists
-        const fileInfo = await FileSystem.getInfoAsync(pdfUri);
-        console.log('File Info:', fileInfo);
-        if (!fileInfo.exists) {
-          Alert.alert('File Not Found', 'The file could not be found.');
-          return;
-        }
-  
-        // Request media library permissions
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        console.log('Permission Status:', status);
-        if (status !== 'granted') {
-          Alert.alert('Permission Denied', 'Permission to access media library is required to download the PDF.');
-          return;
-        }
-  
-        // Create asset and album
-        try {
-          const asset = await MediaLibrary.createAssetAsync(pdfUri);
-          console.log('Asset Created:', asset);
-          await MediaLibrary.createAlbumAsync('Download', asset, false);
-          Alert.alert('PDF Downloaded', 'PDF has been downloaded to your device.');
-        } catch (createAssetError) {
-          console.error('Error creating asset:', createAssetError);
-          Alert.alert('Error', `Error creating asset: ${createAssetError.message}`);
+        if (Platform.OS === 'android') {
+          const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+          if (permissions.granted) {
+            const base64Data = await FileSystem.readAsStringAsync(pdfUri, { encoding: FileSystem.EncodingType.Base64 });
+            const newUri = await FileSystem.StorageAccessFramework.createFileAsync(
+              permissions.directoryUri,
+              'DownloadedPDF.pdf',
+              'application/pdf'
+            );
+            await FileSystem.writeAsStringAsync(newUri, base64Data, { encoding: FileSystem.EncodingType.Base64 });
+            Alert.alert('PDF Downloaded', `PDF has been downloaded to ${newUri}`);
+          } else {
+            Alert.alert('Permission Denied', 'Unable to access storage.');
+          }
+        } else {
+          Alert.alert('PDF Downloaded', `PDF has been saved to ${pdfUri}`);
         }
       } catch (error) {
         console.error('Error downloading PDF:', error);
-        Alert.alert('Error', `Error downloading PDF: ${error.message}`);
       }
     }
   };
@@ -300,22 +290,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     backgroundColor: '#2196F3',
-    borderRadius: 5,
-    alignItems: 'center',
+    borderRadius: 10,
   },
   closeButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
   },
   downloadButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#ff9900',
-    borderRadius: 5,
-    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    borderRadius: 10,
   },
   downloadButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
   },
 });
