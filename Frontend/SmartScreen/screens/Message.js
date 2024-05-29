@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageUploadTwo from './ImageUploadTwo'; // Assume this is your image upload component
 import * as Print from 'expo-print';
@@ -118,12 +118,27 @@ const BottomAppBar = () => {
 
   const handleDownloadPDF = async () => {
     if (pdfUri) {
-      const downloadPath = `${FileSystem.documentDirectory}DownloadedPDF.pdf`;
-      await FileSystem.copyAsync({
-        from: pdfUri,
-        to: downloadPath,
-      });
-      Alert.alert('PDF Downloaded', `PDF has been downloaded to ${downloadPath}`);
+      try {
+        if (Platform.OS === 'android') {
+          const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+          if (permissions.granted) {
+            const base64Data = await FileSystem.readAsStringAsync(pdfUri, { encoding: FileSystem.EncodingType.Base64 });
+            const newUri = await FileSystem.StorageAccessFramework.createFileAsync(
+              permissions.directoryUri,
+              'DownloadedPDF.pdf',
+              'application/pdf'
+            );
+            await FileSystem.writeAsStringAsync(newUri, base64Data, { encoding: FileSystem.EncodingType.Base64 });
+            Alert.alert('PDF Downloaded', `PDF has been downloaded to ${newUri}`);
+          } else {
+            Alert.alert('Permission Denied', 'Unable to access storage.');
+          }
+        } else {
+          Alert.alert('PDF Downloaded', `PDF has been saved to ${pdfUri}`);
+        }
+      } catch (error) {
+        console.error('Error downloading PDF:', error);
+      }
     }
   };
 
@@ -142,7 +157,7 @@ const BottomAppBar = () => {
       <View style={styles.inputContainer}>
         <ImageUploadTwo changeImage={handleChangeImage} />
         <TouchableOpacity style={styles.postButton} onPress={handlePostMessage}>
-          <Feather name="send" size={20} color="white" />
+          <Feather name="send" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
       <Modal
@@ -227,30 +242,19 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 1,
+    padding: 15,
     borderTopColor: '#ccc',
-
     borderTopWidth: 1,
     backgroundColor: 'rgba(240, 240, 240, 0.5)',
     width: '100%',
   },
   postButton: {
     backgroundColor: '#ff9900',
-
-    backgroundColor:"#CBCBCB",
-    borderRadius: 25,
-    top:10,
-  },
-  postButton: {
-    backgroundColor: '#AF6A00',
-
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16,
-    left: -10,
   },
   pdfButton: {
     marginTop: 10,
@@ -284,22 +288,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     backgroundColor: '#2196F3',
-    borderRadius: 5,
-    alignItems: 'center',
+    borderRadius: 10,
   },
   closeButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
   },
   downloadButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#ff9900',
-    borderRadius: 5,
-    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    borderRadius: 10,
   },
   downloadButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
   },
 });
