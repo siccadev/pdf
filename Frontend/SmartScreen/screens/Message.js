@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ImageUploadTwo from './ImageUploadTwo';
+import ImageUploadTwo from './ImageUploadTwo'; // Assume this is your image upload component
+import * as Print from 'expo-print';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
-import RNImageToPdf from 'react-native-image-to-pdf';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 
 const { width, height } = Dimensions.get('window');
 
@@ -97,28 +99,63 @@ const BottomAppBar = () => {
     setImageUrl(url);
   };
 
-  const handleConvertToPDF = async (imagePath) => {
+  const handleConvertToPDF = async (image) => {
     try {
-      const options = {
-        imagePaths: [imagePath],
-        name: 'PDFName',
-        maxSize: {
-          width: 900,
-          height: Math.round(height / width * 900),
-        },
-        quality: 0.7,
-      };
-      const pdf = await RNImageToPdf.createPDFbyImages(options);
-      setPdfUri(pdf.filePath);
+      const html = `
+        <html>
+          <body>
+            <img src="${image}" style="width: 100%; height: auto;" />
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html });
+      setPdfUri(uri);
       setModalVisible(true);
     } catch (e) {
       console.log(e);
-      Alert.alert('Error', 'Failed to convert image to PDF.');
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (pdfUri) {
+      try {
+        // Ensure the file exists
+        const fileInfo = await FileSystem.getInfoAsync(pdfUri);
+        console.log('File Info:', fileInfo);
+        if (!fileInfo.exists) {
+          Alert.alert('File Not Found', 'The file could not be found.');
+          return;
+        }
+  
+        // Request media library permissions
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        console.log('Permission Status:', status);
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Permission to access media library is required to download the PDF.');
+          return;
+        }
+  
+        // Create asset and album
+        try {
+          const asset = await MediaLibrary.createAssetAsync(pdfUri);
+          console.log('Asset Created:', asset);
+          await MediaLibrary.createAlbumAsync('Download', asset, false);
+          Alert.alert('PDF Downloaded', 'PDF has been downloaded to your device.');
+        } catch (createAssetError) {
+          console.error('Error creating asset:', createAssetError);
+          Alert.alert('Error', `Error creating asset: ${createAssetError.message}`);
+        }
+      } catch (error) {
+        console.error('Error downloading PDF:', error);
+        Alert.alert('Error', `Error downloading PDF: ${error.message}`);
+      }
+    }
+  };
+  
+
   return (
-    <View style={styles.container}>
+    <View style={styles.view}>
       <ScrollView style={styles.messageContainer}>
         {messages.map(message => (
           <MessageCard
@@ -158,6 +195,12 @@ const BottomAppBar = () => {
           >
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.downloadButton}
+            onPress={handleDownloadPDF}
+          >
+            <Text style={styles.downloadButtonText}>Download PDF</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </View>
@@ -165,13 +208,16 @@ const BottomAppBar = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  view: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    paddingHorizontal: width * 0.05,
   },
   messageContainer: {
     flex: 1,
-    marginTop: 60,
+    marginTop: height * 0.1,
+    width: '100%',
   },
   messageCard: {
     flexDirection: 'row',
@@ -181,10 +227,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -213,10 +256,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     borderTopColor: '#ccc',
+    borderTopWidth: 1,
     backgroundColor: 'rgba(240, 240, 240, 0.5)',
+    width: '100%',
   },
   postButton: {
-    backgroundColor: '#209FA6',
+    backgroundColor: '#ff9900',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -226,7 +271,7 @@ const styles = StyleSheet.create({
   pdfButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#ff9900',
     borderRadius: 5,
     alignItems: 'center',
   },
@@ -242,10 +287,7 @@ const styles = StyleSheet.create({
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
@@ -262,6 +304,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  downloadButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#ff9900',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  downloadButtonText: {
     color: '#fff',
     fontSize: 16,
   },
