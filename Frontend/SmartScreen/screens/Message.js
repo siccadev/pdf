@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageUploadTwo from './ImageUploadTwo';
-import * as Print from 'expo-print';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
-import * as FileSystem from 'expo-file-system';
+import RNImageToPdf from 'react-native-image-to-pdf';
 
 const { width, height } = Dimensions.get('window');
 
@@ -98,27 +97,23 @@ const BottomAppBar = () => {
     setImageUrl(url);
   };
 
-  const handleConvertToPDF = async (image) => {
-    const htmlContent = `
-      <html>
-        <body style="text-align: center;">
-          <img src="${image}" style="width: 100%; height: auto;" />
-        </body>
-      </html>
-    `;
-
+  const handleConvertToPDF = async (imagePath) => {
     try {
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      const fileUri = `${FileSystem.documentDirectory}converted.pdf`;
-      await FileSystem.moveAsync({
-        from: uri,
-        to: fileUri
-      });
-      setPdfUri(fileUri);
+      const options = {
+        imagePaths: [imagePath],
+        name: 'PDFName',
+        maxSize: {
+          width: 900,
+          height: Math.round(height / width * 900),
+        },
+        quality: 0.7,
+      };
+      const pdf = await RNImageToPdf.createPDFbyImages(options);
+      setPdfUri(pdf.filePath);
       setModalVisible(true);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      Alert.alert('Error', 'An error occurred while generating the PDF.');
+    } catch (e) {
+      console.log(e);
+      Alert.alert('Error', 'Failed to convert image to PDF.');
     }
   };
 
