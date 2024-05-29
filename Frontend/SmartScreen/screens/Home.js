@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Image } from "expo-image";
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-
+import { Feather } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('window');
 
 const Home = ({ navigation }) => {
@@ -24,10 +23,9 @@ const Home = ({ navigation }) => {
       </Text>
       <TouchableOpacity 
         style={styles.photoButton}
-        onPress={() => navigation.navigate('Message')}
-      >
-        <Ionicons name="star-outline" size={30} color="#ff9900" />
-        <Text style={styles.takePhoto}>commencer</Text>
+        onPress={() => navigation.navigate('Message')} >
+  <Text style={styles.takePhoto}>
+    <Feather name="camera" size={24} color="white" style={styles.c}/>  Commencer</Text>
       </TouchableOpacity>
     </View>
   );
@@ -41,7 +39,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.05,
   },
   image: {
-    width: '115%',
+    width: '114%',
     height: height * 0.5,
     borderRadius: 20,
     marginTop: height * 0.03,
@@ -54,24 +52,23 @@ const styles = StyleSheet.create({
   help: {
     fontSize: 18,
     color: "#FFFFFF",
+    top:20,
   },
   smartScan: {
     marginTop: height * 0.02,
     fontSize: 25,
     color: "#ff9900",
-    fontFamily: "Jost-Regular",
     textAlign: "center",
     textShadowColor: "rgba(0, 0, 0, 0.25)",
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 7,
   },
   description: {
-    marginTop: height * 0.02,
-    fontSize: 16,
+    marginTop: height * 0.03,
+    fontSize: 19,
     color: "#000000",
     textAlign: "center",
-    paddingHorizontal: width * 0.1,
-    fontFamily: "Helvetica",
+    paddingHorizontal: width * 0.02,
   },
   photoButton: {
     flexDirection: "row",
@@ -81,8 +78,18 @@ const styles = StyleSheet.create({
   takePhoto: {
     marginLeft: 10,
     fontSize: 18,
-    color: "#ff9900",
+    color: "white",
+    backgroundColor:"#AF6A00",
+    borderRadius:20,
+    width:200,
+    height:40,
+    textAlign: "center",
+    paddingVertical:6,
+    top:80,
+top:80,
+left:-5,
   },
+  
 });
 
 export default Home;

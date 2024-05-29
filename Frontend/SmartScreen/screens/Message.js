@@ -142,7 +142,7 @@ const BottomAppBar = () => {
       <View style={styles.inputContainer}>
         <ImageUploadTwo changeImage={handleChangeImage} />
         <TouchableOpacity style={styles.postButton} onPress={handlePostMessage}>
-          <Feather name="send" size={20} color="#fff" />
+          <Feather name="send" size={20} color="white" />
         </TouchableOpacity>
       </View>
       <Modal
@@ -227,19 +227,30 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    padding: 1,
     borderTopColor: '#ccc',
+
     borderTopWidth: 1,
     backgroundColor: 'rgba(240, 240, 240, 0.5)',
     width: '100%',
   },
   postButton: {
     backgroundColor: '#ff9900',
+
+    backgroundColor:"#CBCBCB",
+    borderRadius: 25,
+    top:10,
+  },
+  postButton: {
+    backgroundColor: '#AF6A00',
+
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 16,
+    left: -10,
   },
   pdfButton: {
     marginTop: 10,
