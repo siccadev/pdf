@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
-
+import { Entypo } from '@expo/vector-icons';
 const { width, height } = Dimensions.get('window');
 
 const MessageCard = ({ id, secondary, imageUrl, onDelete, onConvertToPDF }) => {
@@ -151,7 +151,7 @@ const PdfScanner = () => {
         style={styles.navigationButton}
         onPress={() => navigation.navigate('PdfEditor')}
       >
-        <Feather name="edit" size={24} color="black" />
+        <Feather name="edit" size={24} color="#AF6A00" />
       </TouchableOpacity>
       <ScrollView style={styles.messageContainer}>
         {messages.map(message => (
@@ -254,33 +254,35 @@ const styles = StyleSheet.create({
     padding: 15,
     borderTopColor: '#ccc',
     borderTopWidth: 1,
-    backgroundColor: 'rgba(240, 240, 240, 0.5)',
+    backgroundColor: 'white',
     width: '100%',
   },
   postButton: {
-    backgroundColor: '#ff9900',
+    backgroundColor: '#007AFF',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    top:2,
+    height: '30%',
+    width: '20%',
   },
   pdfButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#ff9900',
+    backgroundColor: '#AF6A00',
     borderRadius: 5,
     alignItems: 'center',
   },
   pdfButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
   },
   modalView: {
-    flex: 1,
     margin: 20,
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 50,
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
@@ -288,6 +290,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    width:190,
+    height:150,
+    top:420,
+    left:80
   },
   webview: {
     width: width - 40,
@@ -296,7 +302,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: 'red',
     borderRadius: 10,
   },
   closeButtonText: {
@@ -306,7 +312,7 @@ const styles = StyleSheet.create({
   downloadButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5FD100',
     borderRadius: 10,
   },
   downloadButtonText: {

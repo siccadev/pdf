@@ -5,6 +5,8 @@ import axios from "axios"
 import { FontAwesome } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
+import { Entypos } from '@expo/vector-icons';
 const cloudName = "db2yjlbsw"
 const uploadPreset = "lzoc60oh"
 
@@ -81,11 +83,10 @@ const ImageUploadTwo = ({ changeImage }) => {
       {uploading && <ActivityIndicator size="large" color="#4CAF50" />}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.customButtonFolder} onPress={openImagePicker}>
-            
-          <EvilIcons name="image" size={54} color="#AF6A00" style={styles.buttonImage} />
+        <Entypo name="image-inverted" size={54} color="#AF6A00"style={styles.buttonImage}  />
         </TouchableOpacity>
         <TouchableOpacity style={styles.customButtonCamera} onPress={handleCameraLaunch}>
-          <Feather name="camera" size={39} color="#AF6A00" style={styles.buttonImag}/>
+        <Entypo name="camera" size={50} color="#AF6A00" style={styles.buttonImag}/>
         </TouchableOpacity>
       </View>
     </View>
