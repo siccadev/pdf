@@ -23,7 +23,7 @@ const Home = ({ navigation }) => {
       </Text>
       <TouchableOpacity 
         style={styles.photoButton}
-        onPress={() => navigation.navigate('Message')} >
+        onPress={() => navigation.navigate('pdfScanner')} >
   <Text style={styles.takePhoto}>
     <Feather name="camera" size={24} color="white" style={styles.c}/>  Commencer</Text>
       </TouchableOpacity>
