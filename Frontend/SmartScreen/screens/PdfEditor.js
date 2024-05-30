@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, Button, TextInput, ScrollView, StyleSheet, Alert, Platform,TouchableOpacity } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-
+import { FontAwesome5 } from '@expo/vector-icons';
 import { PDFDocument, rgb } from 'react-native-pdf-lib';
+import { useNavigation } from '@react-navigation/native';
 
 const PdfEditor = () => {
+      const navigation = useNavigation();
+
       const [pdfContent, setPdfContent] = useState('');
       const [editedContent, setEditedContent] = useState('');
       const [pdfUri, setPdfUri] = useState(null);
@@ -72,7 +75,10 @@ const PdfEditor = () => {
 
       return (
             <ScrollView contentContainerStyle={styles.container}>
-                  <Button title="Upload PDF" onPress={handleUploadPDF} />
+                  <TouchableOpacity onPress={() => navigation.navigate('pdfScanner')} style={styles.retour}>
+                   <FontAwesome5 name="arrow-left" size={24} color="black" />
+                  </TouchableOpacity>     
+                   <Button title="Upload PDF" onPress={handleUploadPDF}color={styles.button.color} />
                   {pdfContent ? (
                         <>
                               <Text style={styles.label}>PDF Content:</Text>
@@ -82,7 +88,8 @@ const PdfEditor = () => {
                                     value={editedContent}
                                     onChangeText={setEditedContent}
                               />
-                              <Button title="Download Edited PDF" onPress={handleDownloadPDF} />
+                              <View style={styles.containe}>
+                              <Button title="Download Edited PDF" onPress={handleDownloadPDF}color={styles.button.color}/></View>
                         </>
                   ) : (
                         <Text>No PDF uploaded</Text>
@@ -97,20 +104,32 @@ const styles = StyleSheet.create({
             padding: 16,
             alignItems: 'center',
             justifyContent: 'center',
+            
       },
+      button: {
+            color: '#AF6A00', // Custom button color
+          },
       label: {
             fontSize: 16,
             fontWeight: 'bold',
             marginVertical: 8,
+            
       },
       textInput: {
             width: '100%',
-            height: 200,
+            height: 500,
             borderColor: '#ccc',
             borderWidth: 1,
             padding: 8,
             marginVertical: 8,
       },
+      retour:{
+            top:40,
+            left:20,
+            position:'absolute',
+            color:'#AF6A00',
+      },
+      
 });
 
 export default PdfEditor;

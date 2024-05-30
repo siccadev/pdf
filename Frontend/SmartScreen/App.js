@@ -16,11 +16,11 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="StartingPage" screenOptions={{ headerShown: false }}>
          <Stack.Screen name="Launch" component={Launch} /> 
-         <Stack.Screen name="Launch" component={Launch} /> 
          {/* <Stack.Screen name="Onbording" component={Onbording} />  */}
-         {/* <Stack.Screen name="Home" component={Home} />  */}
-         {/* <Stack.Screen name="Help" component={Help} />  */}
-        <Stack.Screen name="Message" component={Message} /> 
+         <Stack.Screen name="Home" component={Home} /> 
+         <Stack.Screen name="Help" component={Help} /> 
+        <Stack.Screen name="pdfScanner" component={pdfScanner} /> 
+        <Stack.Screen name="PdfEditor" component={PdfEditor} /> 
        </Stack.Navigator>
     </NavigationContainer>
   );
