@@ -12,7 +12,7 @@ const Launch = () => {
   useEffect(() => {
       const timer = setTimeout(() => {
         navigation.navigate('Home');
-      }, 3000);
+      }, 1500);
       return () => clearTimeout(timer);
     }, []);
 

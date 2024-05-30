@@ -34,7 +34,7 @@ const MessageCard = ({ id, secondary, imageUrl, onDelete, onConvertToPDF }) => {
   );
 };
 
-const BottomAppBar = () => {
+const PdfScanner = () => {
   const [inputValue, setInputValue] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [messages, setMessages] = useState([]);
@@ -142,10 +142,17 @@ const BottomAppBar = () => {
       }
     }
   };
-  
+
+
 
   return (
     <View style={styles.view}>
+      <TouchableOpacity
+        style={styles.navigationButton}
+        onPress={() => navigation.navigate('PdfEditor')}
+      >
+        <Feather name="edit" size={24} color="black" />
+      </TouchableOpacity>
       <ScrollView style={styles.messageContainer}>
         {messages.map(message => (
           <MessageCard
@@ -306,6 +313,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  navigationButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+  },
 });
 
-export default BottomAppBar;
+export default PdfScanner;

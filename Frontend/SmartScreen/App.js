@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from "./screens/Home"
-import Message from "./screens/Message"
+import pdfScanner from "./screens/pdfScanner"
 import Launch from "./screens/Launch "
 import Help from "./screens/Help"
 import Onbording from "./screens/Onbording"
@@ -15,12 +15,12 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="StartingPage" screenOptions={{ headerShown: false }}>
-         {/* <Stack.Screen name="Launch" component={Launch} />  */}
+         <Stack.Screen name="Launch" component={Launch} /> 
          {/* <Stack.Screen name="Onbording" component={Onbording} />  */}
-         {/* <Stack.Screen name="Home" component={Home} />  */}
-         {/* <Stack.Screen name="Help" component={Help} />  */}
+         <Stack.Screen name="Home" component={Home} /> 
+         <Stack.Screen name="Help" component={Help} /> 
+        <Stack.Screen name="pdfScanner" component={pdfScanner} /> 
         <Stack.Screen name="PdfEditor" component={PdfEditor} /> 
-        {/* <Stack.Screen name="Message" component={Message} />  */}
        </Stack.Navigator>
     </NavigationContainer>
   );
